@@ -1,14 +1,20 @@
 package fr.pturpin.slackpublish
 
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.whenever
 import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
+import org.eclipse.jgit.api.Git
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
+import org.mockito.Answers
 
 class SlackMessageTest {
 
@@ -172,6 +178,51 @@ class SlackMessageTest {
                     .build(),
                 SectionBlock.builder()
                     .blockId("id3")
+                    .build()
+            ))
+            .build())
+    }
+
+    @Test
+    fun git_GivenMockedGitRepositoryAndSetFormat_UseTheDefaultFormat() {
+        val project = project()
+        var message = createMessage(project)
+        val git = mock<Git>(defaultAnswer=Answers.RETURNS_DEEP_STUBS) {
+            on { repository.branch } doReturn "myMaster"
+        }
+
+        val gitBlock = spy(message.createGitBlock()) {
+            doReturn(git).whenever(mock).git()
+        }
+
+        message = spy(message) {
+            on {createGitBlock() } doReturn gitBlock
+        }
+
+        message.git {
+            format {
+                section {
+                    blockId = currentBranchName()
+                }
+
+                section {
+                    blockId = "${project.version}"
+                }
+            }
+        }
+
+        project.version = "42"
+
+        val payload = message.payload.get()
+
+        assertThat(payload).isEqualTo(Payload.builder()
+            .blocks(listOf(
+                SectionBlock.builder()
+                    .blockId("myMaster")
+                    .build(),
+                DividerBlock(),
+                SectionBlock.builder()
+                    .blockId("42")
                     .build()
             ))
             .build())

@@ -4,11 +4,12 @@ import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
+import fr.pturpin.slackpublish.block.GitBlock
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 
-class SlackMessage(val name: String, project: Project) {
+class SlackMessage(val name: String, private val project: Project) {
 
     /**
      * WebHook URL to use for this message.
@@ -83,5 +84,18 @@ class SlackMessage(val name: String, project: Project) {
             section
         }
     }
+
+    /**
+     * Add a new section in the produced payload with Git information
+     *
+     * See [GitBlock] for more details.
+     */
+    fun git(configure: GitBlock.() -> Unit = {}) {
+        val git = createGitBlock()
+        configure(git)
+        git.format(this)
+    }
+
+    internal fun createGitBlock() = GitBlock(project)
 
 }
