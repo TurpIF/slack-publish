@@ -8,7 +8,7 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.slack.api:slack-api-model:1.0.6")
+    api("com.slack.api:slack-api-model:1.0.6")
     implementation("com.slack.api:slack-api-client:1.0.6")
 
     testImplementation("junit:junit:4.13")
