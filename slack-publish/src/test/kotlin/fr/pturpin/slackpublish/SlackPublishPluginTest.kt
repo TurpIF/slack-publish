@@ -67,8 +67,10 @@ class SlackPublishPluginTest {
                 assertThat(it.name).isEqualTo(taskName)
                 assertThat(it.description).isEqualTo("Send the message `$messageName` to Slack")
                 assertThat(it.group).isEqualTo("slack")
-                assertThat(it.message.isPresent).isTrue()
-                assertThat(it.message.get().name).isEqualTo(messageName)
+                assertThat(it.messages.isPresent).isTrue()
+                assertThat(it.messages.get()).hasSize(1).allSatisfy {
+                    assertThat(it.name).isEqualTo(messageName)
+                }
             }
     }
 

@@ -8,10 +8,13 @@ version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("com.slack.api:slack-api-model:1.0.6")
+    implementation("com.slack.api:slack-api-client:1.0.6")
 
     testImplementation("junit:junit:4.13")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("org.assertj:assertj-core:3.15.0")
+    testImplementation("org.mock-server:mockserver-junit-rule:5.10.0")
 }
 
 gradlePlugin {

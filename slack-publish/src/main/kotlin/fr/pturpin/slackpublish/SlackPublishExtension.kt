@@ -7,7 +7,7 @@ open class SlackPublishExtension(project: Project) {
 
     val messages: SlackMessageContainer = project.container(
         SlackMessage::class.java) {
-        SlackMessage(it)
+        SlackMessage(it, project)
     }
 
     fun messages(configure: SlackMessageContainer.() -> Unit) {

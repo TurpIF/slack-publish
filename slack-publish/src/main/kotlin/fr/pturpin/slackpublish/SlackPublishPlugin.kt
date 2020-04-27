@@ -11,6 +11,17 @@ import org.gradle.api.Project
  * ```groovy
  * slack {
  *     dummy {
+ *         webHook = "https://hooks.slack.com/services/..."
+ *     }
+ * }
+ *
+ * task myTask(type: SlackTask) {
+ *     message("dummy1") {
+ *         webHook = "..."
+ *     }
+ *
+ *     message("dummy2") {
+ *         webHook = "..."
  *     }
  * }
  * ```
@@ -26,7 +37,7 @@ class SlackPublishPlugin: Plugin<Project> {
             val taskName = "send${name.capitalize()}MessageToSlack"
 
             target.tasks.register(taskName, SlackTask::class.java) {
-                message.set(this@all)
+                messages.add(this@all)
                 group = "slack"
                 description = "Send the message `${this@all.name}` to Slack"
             }
