@@ -5,6 +5,8 @@ import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
 import fr.pturpin.slackpublish.block.GitBlock
+import fr.pturpin.slackpublish.block.PublicationBlock
+import fr.pturpin.slackpublish.block.SlackMessageBlock
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -91,11 +93,23 @@ class SlackMessage(val name: String, private val project: Project) {
      * See [GitBlock] for more details.
      */
     fun git(configure: GitBlock.() -> Unit = {}) {
-        val git = createGitBlock()
-        configure(git)
-        git.format(this)
+        customBlock(createGitBlock(), configure)
     }
 
     internal fun createGitBlock() = GitBlock(project)
+
+    /**
+     * Add a new section in the produced payload with publication information
+     *
+     * See [PublicationBlock] for more details.
+     */
+    fun publication(configure: PublicationBlock.() -> Unit = {}) {
+        customBlock(PublicationBlock(project), configure)
+    }
+
+    private fun <T : SlackMessageBlock> customBlock(block: T, configure: T.() -> Unit) {
+        configure(block)
+        block.format(this)
+    }
 
 }

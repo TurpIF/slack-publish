@@ -13,7 +13,23 @@ import org.gradle.api.provider.Provider
 import java.io.File
 import java.io.IOException
 
-class GitBlock(project: Project) {
+/**
+ * The default format add a divided section block with those fields:
+ * - git branch
+ * - git commit
+ * - git author
+ * - git SHA-1
+ *
+ * It is rendered like this:
+ *
+ *      |-----------------------------------------------------------------------------------|
+ *      | *Git Branch*                           *Git Author*                               |
+ *      | Master                                 <mailto:author@mail.com|author@mail.com>   |
+ *      |                                                                                   |
+ *      | *Git Commit*                           *Git SHA-1*                                |
+ *      | The short message of the last commit   `7d06b2aec79d64065eeefdcab505eba5ab22675b` |
+ */
+class GitBlock(project: Project): SlackMessageBlock() {
 
     /**
      * Directory that is used as starting point to search for a git repository.
@@ -29,8 +45,6 @@ class GitBlock(project: Project) {
     private val gitProvider: Provider<Git> = root.map {
         findGitRepository(project.file(root))
     }
-
-    private var format: (SlackMessage.() -> Unit)? = null
 
     internal fun git() = try {
         gitProvider.get()
@@ -74,34 +88,7 @@ class GitBlock(project: Project) {
         return git().log().setMaxCount(1).call().singleOrNull()
     }
 
-    /**
-     * Override the default format.
-     *
-     * The default format add a divided section block with those fields:
-     * - git branch
-     * - git commit
-     * - git author
-     * - git SHA-1
-     *
-     * It is rendered like this:
-     *
-     *      |-----------------------------------------------------------------------------------|
-     *      | *Git Branch*                           *Git Author*                               |
-     *      | Master                                 <mailto:author@mail.com|author@mail.com>   |
-     *      |                                                                                   |
-     *      | *Git Commit*                           *Git SHA-1*                                |
-     *      | The short message of the last commit   `7d06b2aec79d64065eeefdcab505eba5ab22675b` |
-     */
-    fun format(configure: SlackMessage.() -> Unit) {
-        format = configure
-    }
-
-    internal fun format(message: SlackMessage) {
-        val usedFormat = format ?: ::defaultFormat
-        usedFormat(message)
-    }
-
-    private fun defaultFormat(message: SlackMessage) {
+    override fun defaultFormat(message: SlackMessage) {
         message.section {
             fields = listOf(
                 markdownText("*Git Branch*\n${currentBranchName()}"),

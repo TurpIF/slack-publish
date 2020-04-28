@@ -5,8 +5,6 @@ import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.whenever
 import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
-import com.slack.api.model.block.composition.MarkdownTextObject
-import com.slack.api.model.block.composition.TextObject
 import com.slack.api.webhook.Payload
 import fr.pturpin.slackpublish.SlackMessage
 import fr.pturpin.slackpublish.SlackPublishPlugin
@@ -324,14 +322,6 @@ class GitBlockTest {
 
         project.pluginManager.apply(SlackPublishPlugin::class.java)
         return project
-    }
-
-    private fun TextObject.assertIsMarkdown(expected: String) {
-        assertThat(this).isInstanceOf(MarkdownTextObject::class.java)
-        assertThat(this as MarkdownTextObject).satisfies {
-            assertThat(it.text).isEqualTo(expected)
-            assertThat(it.verbatim as Boolean?).isNull()
-        }
     }
 
 }
