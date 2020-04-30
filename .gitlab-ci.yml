@@ -28,7 +28,7 @@ test:
   script: ./gradlew check
   artifacts:
     reports:
-      junit: ./**/build/test-results/test/**/TEST-*.xml
+      junit: ./**/build/test-results/test/TEST-*.xml
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
