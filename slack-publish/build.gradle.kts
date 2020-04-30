@@ -1,6 +1,8 @@
 plugins {
     `kotlin-dsl`
     id("java-gradle-plugin")
+    jacoco
+    id("de.jansauer.printcoverage") version "2.0.0"
 }
 
 group = "fr.pturpin.slackpublish"
@@ -16,6 +18,18 @@ dependencies {
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("org.assertj:assertj-core:3.15.0")
     testImplementation("org.mock-server:mockserver-junit-rule:5.10.0")
+}
+
+tasks.check {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
+    }
+
+    finalizedBy(tasks.printCoverage)
 }
 
 gradlePlugin {

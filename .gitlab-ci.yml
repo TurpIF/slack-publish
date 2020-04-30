@@ -26,6 +26,7 @@ build:
 test:
   stage: test
   script: ./gradlew check
+  coverage: '/^Coverage:\s(\d+\.\d+%)/'
   artifacts:
     reports:
       junit: ./**/build/test-results/test/TEST-*.xml
