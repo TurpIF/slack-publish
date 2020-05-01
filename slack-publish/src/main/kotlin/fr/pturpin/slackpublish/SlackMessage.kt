@@ -14,7 +14,7 @@ import org.gradle.api.provider.Provider
 class SlackMessage(val name: String, private val project: Project) {
 
     /**
-     * WebHook URL to use for this message.
+     * Mandatory WebHook URL to use for this message.
      *
      * To get a new URL, you need to first setup slack:
      * <ul>
@@ -50,7 +50,8 @@ class SlackMessage(val name: String, private val project: Project) {
     /**
      * Add a new block in the produced payload.
      *
-     * As [payload], the given block is lazily appended after the already registered updates.
+     * As [payload], the given block is lazily appended after the already registered updates. See factory methods in
+     * [Blocks].
      *
      * The [insertDivider] parameter let you indicate if you want to separate the appended block with a divider. Note
      * that if there is no previous blocks, no divider is inserted.
@@ -74,7 +75,8 @@ class SlackMessage(val name: String, private val project: Project) {
      * Add a new section block in the produced payload.
      *
      * As [block], the given section is lazily appended after the already registered updates.
-     * This is a specialization of [block], so it obey the same rules.
+     * This is a specialization of [block], so it obey the same rules. See factory methods in
+     * [com.slack.api.model.block.composition.BlockCompositions] to create new elements.
      *
      * @param insertDivider `true` to indicate if a divider should be inserted
      * @param configure lazy definition of the block

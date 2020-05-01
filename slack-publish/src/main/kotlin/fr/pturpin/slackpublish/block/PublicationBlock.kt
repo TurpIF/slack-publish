@@ -10,6 +10,18 @@ import java.time.Clock
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * The default format of this block is rendered like this:
+ *
+ *       |--------------------------------------------------------------------|
+ *       | :tada:  Congrats                                                   |
+ *       | :rocket:  *publicName* successfully published on *repositoryName*  |
+ *       | :date:  Fri, 1 May 2020 13:37:42 GMT                               |
+ *       | :package: `groupId:artifactId:version:classifier`                  |
+ *       | :+1: Tell your friends!                                            |
+ *
+ * It is supported to not have repository name, nor classifier.
+ */
 class PublicationBlock internal constructor(
     private val project: Project,
     private val clock: Clock
