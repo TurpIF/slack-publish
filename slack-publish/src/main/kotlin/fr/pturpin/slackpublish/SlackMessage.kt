@@ -4,6 +4,7 @@ import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
+import fr.pturpin.slackpublish.block.ChangelogBlock
 import fr.pturpin.slackpublish.block.GitBlock
 import fr.pturpin.slackpublish.block.PublicationBlock
 import fr.pturpin.slackpublish.block.SlackMessageBlock
@@ -107,6 +108,15 @@ class SlackMessage(val name: String, private val project: Project) {
      */
     fun publication(configure: PublicationBlock.() -> Unit = {}) {
         customBlock(PublicationBlock(project), configure)
+    }
+
+    /**
+     * Add a new section in the produced payload with changelog information
+     *
+     * See [ChangelogBlock] for more details.
+     */
+    fun changelog(configure: ChangelogBlock.() -> Unit) {
+        customBlock(ChangelogBlock(project), configure)
     }
 
     internal fun <T : SlackMessageBlock> customBlock(block: T, configure: T.() -> Unit) {

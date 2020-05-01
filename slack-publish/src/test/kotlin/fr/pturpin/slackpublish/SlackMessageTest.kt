@@ -1,13 +1,12 @@
 package fr.pturpin.slackpublish
 
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
+import fr.pturpin.slackpublish.block.ChangelogBlock
+import fr.pturpin.slackpublish.block.PublicationBlock
 import fr.pturpin.slackpublish.block.SlackMessageBlock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -270,6 +269,28 @@ class SlackMessageTest {
                     .build()
             ))
             .build())
+    }
+
+    @Test
+    fun changelog_GivenConfiguration_UseItAsCustomBlock() {
+        val project = project()
+        val message = spy(createMessage(project))
+        val configure: ChangelogBlock.() -> Unit = { }
+
+        message.changelog(configure)
+
+        verify(message).customBlock(any(), same(configure))
+    }
+
+    @Test
+    fun publication_GivenConfiguration_UseItAsCustomBlock() {
+        val project = project()
+        val message = spy(createMessage(project))
+        val configure: PublicationBlock.() -> Unit = { }
+
+        message.publication(configure)
+
+        verify(message).customBlock(any(), same(configure))
     }
 
     private fun createMessage(project: Project = project()): SlackMessage {
