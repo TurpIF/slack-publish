@@ -8,6 +8,7 @@ import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
+import fr.pturpin.slackpublish.block.SlackMessageBlock
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.eclipse.jgit.api.Git
@@ -223,6 +224,49 @@ class SlackMessageTest {
                 DividerBlock(),
                 SectionBlock.builder()
                     .blockId("42")
+                    .build()
+            ))
+            .build())
+    }
+
+    @Test
+    fun customBlock_GivenAnyConfiguration_ExecuteConfigurationLazilyWhenPayloadIsRetrieved() {
+        val project = project()
+
+        val customBlock = object : SlackMessageBlock() {
+            var element = project.objects.property(String::class.java)
+
+            override fun defaultFormat(message: SlackMessage) {
+                val e = element.get()
+                message.section {
+                    blockId = e
+                }
+            }
+        }
+
+        val myProperty = project.objects.property(String::class.java)
+
+        val message = createMessage(project)
+
+        message.section {
+            blockId = "42"
+        }
+
+        message.customBlock(customBlock) {
+            element.set(myProperty)
+        }
+
+        myProperty.set("1337")
+        val payload = message.payload.get()
+
+        assertThat(payload).isEqualTo(Payload.builder()
+            .blocks(listOf(
+                SectionBlock.builder()
+                    .blockId("42")
+                    .build(),
+                DividerBlock(),
+                SectionBlock.builder()
+                    .blockId("1337")
                     .build()
             ))
             .build())

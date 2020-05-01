@@ -109,9 +109,26 @@ class SlackMessage(val name: String, private val project: Project) {
         customBlock(PublicationBlock(project), configure)
     }
 
-    private fun <T : SlackMessageBlock> customBlock(block: T, configure: T.() -> Unit) {
+    internal fun <T : SlackMessageBlock> customBlock(block: T, configure: T.() -> Unit) {
+        // Configuration is done eagerly, so this help Gradle building a graph dependencies between properties.
         configure(block)
-        block.format(this)
+
+        // Formatting is done lazily, so user don't need to think about it when providing custom formats.
+        payloadConfigurations.add {
+            val clone = SlackMessage(name, project)
+            block.format(clone)
+            apply(clone, this)
+        }
+    }
+
+    private fun apply(other: SlackMessage, payload: Payload) {
+        if (other.webHook.isPresent) {
+            webHook.set(other.webHook)
+        }
+
+        other.payloadConfigurations.forEach {
+            it(payload)
+        }
     }
 
 }
