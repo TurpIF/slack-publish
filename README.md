@@ -183,3 +183,50 @@ tasks.withType<PublishToMavenRepository>() {
 
 This generates a slack message task for all maven publication tasks you declared and set the appropriate properties such
 as the group ID, artifact ID, version, repository name, product public name.
+
+## Insert changelog information
+
+You can insert the changelog specific to your project version.
+
+```kotlin
+slack {
+    message {
+        register("dummy") {
+            changelog {
+                versionLinesStartWith("##")
+            }
+        }
+    }
+}
+```
+
+Version section are extracted by recognizing lines declaring new version. For example, given a `CHANGELOG.md` file
+containing:
+
+```markdown
+## Version 2.0.2
+
+ - Fix 1
+
+## Version 2.0.1
+
+  - Feature 1
+    - Feature 1.a
+    - Feature 1.b
+  - Feature 2
+  - ...
+  
+## Version 2.0.0
+
+  - ...
+```
+
+If the project version is `2.0.1`, then this will be extracted:
+
+```markdown
+- Feature 1
+  - Feature 1.a
+  - Feature 1.b
+- Feature 2
+- ...
+```
