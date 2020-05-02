@@ -92,6 +92,7 @@ So you have the full control over your message. Blocks, sections, fields, button
 The plugin provides some helper methods to help with composing your messages:
 - `block` directive inserts a new [block](https://api.slack.com/reference/block-kit/blocks) in the payload (with or without a divider above)
 - `section` directive inserts a new [section](https://api.slack.com/reference/block-kit/blocks#section) in the payload
+- `fields` directive inserts a new [section](https://api.slack.com/reference/block-kit/blocks#section) in the payload with fields
 
 ```kotlin
 import com.slack.api.model.block.Blocks.context
@@ -113,11 +114,10 @@ slack {
                 text = markdownText("This is my *first* section :+1:")
             }
 
-            section(insertDivider=false) {
-                fields = listOf(
-                    markdownText(":rocket:\nField 1"),
-                    markdownText(":tada:\nField 2")
-                )
+            fields {
+                insertDivider.set(false)
+                field(":rocket:", "Field 1")
+                field(":tada:", "Field 2")
             }
 
             block(insertDivider = false) {

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "fr.pturpin.slackpublish"
-version = "1.0-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
