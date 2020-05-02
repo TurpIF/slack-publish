@@ -6,6 +6,7 @@ import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
 import fr.pturpin.slackpublish.block.ChangelogBlock
+import fr.pturpin.slackpublish.block.FieldBlock
 import fr.pturpin.slackpublish.block.PublicationBlock
 import fr.pturpin.slackpublish.block.SlackMessageBlock
 import org.assertj.core.api.Assertions.assertThat
@@ -229,7 +230,7 @@ class SlackMessageTest {
     }
 
     @Test
-    fun customBlock_GivenAnyConfiguration_ExecuteConfigurationLazilyWhenPayloadIsRetrieved() {
+    fun customBlock_GivenAnyEagerConfiguration_ExecuteConfigurationEagerlyButFormattingLazilyWhenPayloadIsRetrieved() {
         val project = project()
 
         val customBlock = object : SlackMessageBlock() {
@@ -243,7 +244,7 @@ class SlackMessageTest {
             }
         }
 
-        val myProperty = project.objects.property(String::class.java)
+        var myProperty = "1337"
 
         val message = createMessage(project)
 
@@ -251,11 +252,54 @@ class SlackMessageTest {
             blockId = "42"
         }
 
-        message.customBlock(customBlock) {
+        message.customBlock(customBlock, isConfigurationLazy=false) {
             element.set(myProperty)
         }
 
-        myProperty.set("1337")
+        myProperty = "0"
+        val payload = message.payload.get()
+
+        assertThat(payload).isEqualTo(Payload.builder()
+            .blocks(listOf(
+                SectionBlock.builder()
+                    .blockId("42")
+                    .build(),
+                DividerBlock(),
+                SectionBlock.builder()
+                    .blockId("1337")
+                    .build()
+            ))
+            .build())
+    }
+
+    @Test
+    fun customBlock_GivenAnyLazyConfiguration_ExecuteAllLazilyWhenPayloadIsRetrieved() {
+        val project = project()
+
+        val customBlock = object : SlackMessageBlock() {
+            var element = project.objects.property(String::class.java)
+
+            override fun defaultFormat(message: SlackMessage) {
+                val e = element.get()
+                message.section {
+                    blockId = e
+                }
+            }
+        }
+
+        var myProperty = "0"
+
+        val message = createMessage(project)
+
+        message.section {
+            blockId = "42"
+        }
+
+        message.customBlock(customBlock, isConfigurationLazy=true) {
+            element.set(myProperty)
+        }
+
+        myProperty = "1337"
         val payload = message.payload.get()
 
         assertThat(payload).isEqualTo(Payload.builder()
@@ -279,7 +323,7 @@ class SlackMessageTest {
 
         message.changelog(configure)
 
-        verify(message).customBlock(any(), same(configure))
+        verify(message).customBlock(any(), eq(false), same(configure))
     }
 
     @Test
@@ -290,7 +334,18 @@ class SlackMessageTest {
 
         message.publication(configure)
 
-        verify(message).customBlock(any(), same(configure))
+        verify(message).customBlock(any(), eq(false), same(configure))
+    }
+
+    @Test
+    fun fields_GivenConfiguration_UseItAsLazyCustomBlock() {
+        val project = project()
+        val message = spy(createMessage(project))
+        val configure: FieldBlock.() -> Unit = { }
+
+        message.fields(configure)
+
+        verify(message).customBlock(any(), eq(true), same(configure))
     }
 
     private fun createMessage(project: Project = project()): SlackMessage {

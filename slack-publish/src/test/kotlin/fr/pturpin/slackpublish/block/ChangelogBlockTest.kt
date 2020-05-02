@@ -2,7 +2,6 @@ package fr.pturpin.slackpublish.block
 
 import com.nhaarman.mockitokotlin2.*
 import com.slack.api.model.block.SectionBlock
-import com.slack.api.model.block.composition.MarkdownTextObject
 import fr.pturpin.slackpublish.SlackMessage
 import fr.pturpin.slackpublish.SlackPublishPlugin
 import org.assertj.core.api.Assertions.assertThat
@@ -226,8 +225,7 @@ class ChangelogBlockTest {
             it(section)
 
             verify(section).text = check {
-                assertThat(it).isInstanceOf(MarkdownTextObject::class.java)
-                assertThat((it as MarkdownTextObject).text).isEqualTo("*Changelog*\n- Fix 1")
+                it.assertIsMarkdown("*Changelog*\n- Fix 1")
             }
         })
     }

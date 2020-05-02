@@ -4,10 +4,7 @@ import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
-import fr.pturpin.slackpublish.block.ChangelogBlock
-import fr.pturpin.slackpublish.block.GitBlock
-import fr.pturpin.slackpublish.block.PublicationBlock
-import fr.pturpin.slackpublish.block.SlackMessageBlock
+import fr.pturpin.slackpublish.block.*
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -91,12 +88,22 @@ class SlackMessage(val name: String, private val project: Project) {
     }
 
     /**
+     * Add a new section block with fields in the produced payload.
+     *
+     * All configuration are done lazily and only executed when massage payload is computed. So you do not need to worry
+     * about any ordering of your properties.
+     */
+    fun fields(configure: FieldBlock.() -> Unit) {
+        customBlock(FieldBlock(project), isConfigurationLazy=true, configure=configure)
+    }
+
+    /**
      * Add a new section in the produced payload with Git information
      *
      * See [GitBlock] for more details.
      */
     fun git(configure: GitBlock.() -> Unit = {}) {
-        customBlock(createGitBlock(), configure)
+        customBlock(createGitBlock(), configure=configure)
     }
 
     internal fun createGitBlock() = GitBlock(project)
@@ -107,7 +114,7 @@ class SlackMessage(val name: String, private val project: Project) {
      * See [PublicationBlock] for more details.
      */
     fun publication(configure: PublicationBlock.() -> Unit = {}) {
-        customBlock(PublicationBlock(project), configure)
+        customBlock(PublicationBlock(project), configure=configure)
     }
 
     /**
@@ -116,15 +123,22 @@ class SlackMessage(val name: String, private val project: Project) {
      * See [ChangelogBlock] for more details.
      */
     fun changelog(configure: ChangelogBlock.() -> Unit) {
-        customBlock(ChangelogBlock(project), configure)
+        customBlock(ChangelogBlock(project), configure=configure)
     }
 
-    internal fun <T : SlackMessageBlock> customBlock(block: T, configure: T.() -> Unit) {
-        // Configuration is done eagerly, so this help Gradle building a graph dependencies between properties.
-        configure(block)
+    internal fun <T : SlackMessageBlock> customBlock(block: T, isConfigurationLazy: Boolean = false, configure: T.() -> Unit) {
+        // By default, configuration is done eagerly, so this help Gradle building a graph dependencies between
+        // properties.
+        if (!isConfigurationLazy) {
+            configure(block)
+        }
 
         // Formatting is done lazily, so user don't need to think about it when providing custom formats.
         payloadConfigurations.add {
+            if (isConfigurationLazy) {
+                configure(block)
+            }
+
             val clone = SlackMessage(name, project)
             block.format(clone)
             apply(clone, this)

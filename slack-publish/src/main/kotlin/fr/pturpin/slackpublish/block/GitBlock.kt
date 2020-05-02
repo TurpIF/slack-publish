@@ -1,6 +1,5 @@
 package fr.pturpin.slackpublish.block
 
-import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import fr.pturpin.slackpublish.SlackMessage
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.errors.RepositoryNotFoundException
@@ -58,6 +57,7 @@ class GitBlock(project: Project): SlackMessageBlock() {
      * If the current branch is detached, a SHA-1 is returned instead.
      */
     fun currentBranchName(): String {
+        // TODO think about git describe
         return git().repository.branch
     }
 
@@ -65,6 +65,7 @@ class GitBlock(project: Project): SlackMessageBlock() {
      * Returns the SHA-1 of the last commit, or null if there is no commit.
      */
     fun lastCommitSha1(): String? {
+        // TODO abbreviate ?
         return lastCommit()?.id?.name()
     }
 
@@ -89,13 +90,11 @@ class GitBlock(project: Project): SlackMessageBlock() {
     }
 
     override fun defaultFormat(message: SlackMessage) {
-        message.section {
-            fields = listOf(
-                markdownText("*Git Branch*\n${currentBranchName()}"),
-                markdownText("*Git Author*\n<mailto:${lastCommitAuthorEmail()}|${lastCommitAuthorEmail()}>"),
-                markdownText("*Git Commit*\n${lastCommitShortMessage()}"),
-                markdownText("*Git SHA-1*\n`${lastCommitSha1()}`")
-            )
+        message.fields {
+            field("Git Branch", currentBranchName())
+            field("Git Author", "<mailto:${lastCommitAuthorEmail()}|${lastCommitAuthorEmail()}>")
+            field("Git Commit", lastCommitShortMessage())
+            field("Git SHA-1", "`${lastCommitSha1()}`")
         }
     }
 
