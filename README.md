@@ -93,6 +93,7 @@ The plugin provides some helper methods to help with composing your messages:
 - `block` directive inserts a new [block](https://api.slack.com/reference/block-kit/blocks) in the payload (with or without a divider above)
 - `section` directive inserts a new [section](https://api.slack.com/reference/block-kit/blocks#section) in the payload
 - `fields` directive inserts a new [section](https://api.slack.com/reference/block-kit/blocks#section) in the payload with fields
+- `context` directive inserts a new [context block](https://api.slack.com/reference/block-kit/blocks#context) in the payload
 
 ```kotlin
 import com.slack.api.model.block.Blocks.context
@@ -120,8 +121,13 @@ slack {
                 field(":tada:", "Field 2")
             }
 
+            context {
+                markdown("A context line")
+                image("http://my.image/path", "alt text")
+            }
+
             block(insertDivider = false) {
-                context(listOf(markdownText("A context line")))
+                // Do unsupported operations
             }
         }
     }

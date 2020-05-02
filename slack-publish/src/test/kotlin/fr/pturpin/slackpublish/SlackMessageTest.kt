@@ -5,10 +5,7 @@ import com.slack.api.model.block.Blocks
 import com.slack.api.model.block.DividerBlock
 import com.slack.api.model.block.SectionBlock
 import com.slack.api.webhook.Payload
-import fr.pturpin.slackpublish.block.ChangelogBlock
-import fr.pturpin.slackpublish.block.FieldBlock
-import fr.pturpin.slackpublish.block.PublicationBlock
-import fr.pturpin.slackpublish.block.SlackMessageBlock
+import fr.pturpin.slackpublish.block.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.eclipse.jgit.api.Git
@@ -344,6 +341,17 @@ class SlackMessageTest {
         val configure: FieldBlock.() -> Unit = { }
 
         message.fields(configure)
+
+        verify(message).customBlock(any(), eq(true), same(configure))
+    }
+
+    @Test
+    fun context_GivenConfiguration_UseItAsLazyCustomBlock() {
+        val project = project()
+        val message = spy(createMessage(project))
+        val configure: ContextBlock.() -> Unit = { }
+
+        message.context(configure)
 
         verify(message).customBlock(any(), eq(true), same(configure))
     }

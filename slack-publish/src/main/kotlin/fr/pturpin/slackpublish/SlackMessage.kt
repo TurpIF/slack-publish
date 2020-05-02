@@ -90,11 +90,21 @@ class SlackMessage(val name: String, private val project: Project) {
     /**
      * Add a new section block with fields in the produced payload.
      *
-     * All configuration are done lazily and only executed when massage payload is computed. So you do not need to worry
+     * The configuration is done lazily and only executed when message payload is computed. So you do not need to worry
      * about any ordering of your properties.
      */
     fun fields(configure: FieldBlock.() -> Unit) {
         customBlock(FieldBlock(project), isConfigurationLazy=true, configure=configure)
+    }
+
+    /**
+     * Add a new context block in the produced payload.
+     *
+     * The configuration is done lazily and only executed when message payload is computed. So you do not need to worry
+     * about any ordering of your properties.
+     */
+    fun context(configure: ContextBlock.() -> Unit) {
+        customBlock(ContextBlock(project), isConfigurationLazy=true, configure=configure)
     }
 
     /**
