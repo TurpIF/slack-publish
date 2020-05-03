@@ -21,6 +21,7 @@ build:
     policy: push
     paths:
       - build
+      - slack-publish/build
       - .gradle
 
 test:
@@ -35,14 +36,20 @@ test:
     policy: pull
     paths:
       - build
+      - slack-publish/build
       - .gradle
 
 publish:
   stage: deploy
   script:
-    - ./gradlew publishPlugins
-      -Pgradle.publish.key="${GRADLE_PUBLISH_KEY}"
-      -Pgradle.publish.secret="${GRADLE_PUBLISH_SECRET}"
+    - ./gradlew publishPlugins -Pgradle.publish.key="${GRADLE_PUBLISH_KEY}" -Pgradle.publish.secret="${GRADLE_PUBLISH_SECRET}"
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - slack-publish/build
+      - .gradle
   when: manual
   only:
     - tags
