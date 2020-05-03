@@ -50,6 +50,5 @@ publish:
       - build
       - slack-publish/build
       - .gradle
-  when: manual
   only:
     - tags
