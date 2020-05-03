@@ -3,10 +3,11 @@ plugins {
     id("java-gradle-plugin")
     jacoco
     id("de.jansauer.printcoverage") version "2.0.0"
+    id("com.gradle.plugin-publish") version "0.11.0"
 }
 
 group = "fr.pturpin.slackpublish"
-version = "1.0.0-SNAPSHOT"
+version = "0.1.0-SNAPSHOT"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -36,7 +37,15 @@ gradlePlugin {
     plugins {
         create("slackpublish") {
             id = "fr.pturpin.slack-publish"
+            displayName = "slack-publish"
+            description = "Plugin to support Slack WebHook in Gradle build"
             implementationClass = "fr.pturpin.slackpublish.SlackPublishPlugin"
         }
     }
+}
+
+pluginBundle {
+    website = "https://gitlab.com/TurpIF/slack-publish"
+    vcsUrl = "https://gitlab.com/TurpIF/slack-publish.git"
+    tags = listOf("slack", "webhook", "ci", "notify")
 }
