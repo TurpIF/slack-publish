@@ -1,7 +1,7 @@
 # slack-publish
 [![Build status](https://gitlab.com/TurpIF/slack-publish/badges/master/pipeline.svg)](https://gitlab.com/TurpIF/slack-publish/commits/master)
 [![Coverage rate](https://gitlab.com/TurpIF/slack-publish/badges/master/coverage.svg)](https://gitlab.com/TurpIF/slack-publish/)
-[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/fr/pturpin/slack-publish/fr.pturpin.slackpublish.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/fr.pturpin.slackpublish)
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/fr/pturpin/slack-publish/fr.pturpin.slack-publish.gradle.plugin/maven-metadata.xml.svg?label=Gradle%20Plugin%20Portal)](https://plugins.gradle.org/plugin/fr.pturpin.slack-publish)
 
 This plugin helps teams by automating their Slack notifications about a product. Slack messages are prepared in the
 `build.gradle` file, and sent accordingly to the configured build lifecycle.
