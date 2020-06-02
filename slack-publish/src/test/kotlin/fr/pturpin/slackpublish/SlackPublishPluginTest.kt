@@ -3,15 +3,28 @@ package fr.pturpin.slackpublish
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockserver.client.MockServerClient
+import org.mockserver.junit.MockServerRule
+import org.mockserver.model.HttpRequest.request
+import org.mockserver.model.HttpResponse.response
+import org.mockserver.model.JsonBody.json
 
 class SlackPublishPluginTest {
 
     @Rule
     @JvmField
     val projectDir = TemporaryFolder()
+
+    @Rule
+    @JvmField
+    var mockServerRule = MockServerRule(this)
+
+    private lateinit var mockServerClient: MockServerClient
 
     @Test
     fun applyPlugin_GivenPluginId_ShouldPopulateSlackExtension() {
@@ -43,6 +56,72 @@ class SlackPublishPluginTest {
 
         project.assertTaskIsRegistered("sendDummy1MessageToSlack", "dummy1")
         project.assertTaskIsRegistered("sendDummy2MessageToSlack", "dummy2")
+    }
+
+    @Test
+    fun kotlinSample_GivenBlockSampleTask_SendAFixedSlackMessage() {
+        javaClass.getResourceAsStream("sample.build.gradle.kts").use {
+            projectDir.newFile("build.gradle.kts").writeBytes(it.readBytes())
+        }
+
+        mockServerClient.`when`(request()).respond(response().withStatusCode(204))
+
+        val result = GradleRunner.create()
+            .withProjectDir(projectDir.root)
+            .withPluginClasspath()
+            .withArguments("sendBlockMessageToSlack", "-PwebHook=http://localhost:${mockServerRule.port}")
+            .build()
+
+        assertThat(result.task(":sendBlockMessageToSlack")!!.outcome).isEqualTo(TaskOutcome.SUCCESS)
+
+        mockServerClient.verify(request()
+            .withBody(json("""{
+                |  "channel": "#alerts",
+                |  "username": "Good Bot",
+                |  "icon_emoji": ":robot:",
+                |  "blocks": [
+                |    {
+                |      "type": "section",
+                |      "text": {
+                |        "type": "mrkdwn",
+                |        "text": "This is my *first* section :+1:"
+                |      }
+                |    },
+                |    {
+                |      "type": "section",
+                |      "fields": [
+                |        {
+                |          "type": "mrkdwn",
+                |          "text": "*:rocket:*\nField 1"
+                |        },
+                |        {
+                |          "type": "mrkdwn",
+                |          "text": "*:tada:*\nField 2"
+                |        },
+                |      ]
+                |    },
+                |    {
+                |      "type": "divider"
+                |    },
+                |    {
+                |      "type": "context",
+                |      "elements": [
+                |        {
+                |          "type": "mrkdwn",
+                |          "text": "A context line"
+                |        },
+                |        {
+                |          "type": "image",
+                |          "image_url": "http://my.image/path",
+                |          "alt_text": "alt text"
+                |        }
+                |      ]
+                |    },
+                |    {
+                |      "type": "divider"
+                |    }
+                |  ]
+                |}""".trimMargin())))
     }
 
     private fun givenProject(): Project {
