@@ -1,3 +1,7 @@
+## Version 0.2.0
+
+- Support simple git describe in git block
+
 ## Version 0.1.0
 
 - Add registration of slack message to be sent

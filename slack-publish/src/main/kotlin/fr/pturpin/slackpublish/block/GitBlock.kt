@@ -1,6 +1,7 @@
 package fr.pturpin.slackpublish.block
 
 import fr.pturpin.slackpublish.SlackMessage
+import fr.pturpin.slackpublish.git.describeAllAlways
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Constants
@@ -57,15 +58,22 @@ class GitBlock(project: Project): SlackMessageBlock() {
      * If the current branch is detached, a SHA-1 is returned instead.
      */
     fun currentBranchName(): String {
-        // TODO think about git describe
         return git().repository.branch
+    }
+
+    /**
+     * Returns the description of the last commit.
+     *
+     * This is equivalent to `git describe --all --always`
+     */
+    fun lastCommitDescribe(): String {
+        return git().describeAllAlways()
     }
 
     /**
      * Returns the SHA-1 of the last commit, or null if there is no commit.
      */
     fun lastCommitSha1(): String? {
-        // TODO abbreviate ?
         return lastCommit()?.id?.name()
     }
 

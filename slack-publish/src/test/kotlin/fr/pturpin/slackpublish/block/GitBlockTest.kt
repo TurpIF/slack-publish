@@ -155,6 +155,48 @@ class GitBlockTest {
     }
 
     @Test
+    fun lastCommitDescription_GivenEmptyRepository_ReturnMaster() {
+        val project = project()
+
+        gitInit()
+
+        val gitBlock = GitBlock(project)
+        val branchName = gitBlock.lastCommitDescribe()
+
+        assertThat(branchName).isEqualTo("refs/heads/master")
+    }
+
+    @Test
+    fun lastCommitDescription_GivenRepositoryOnBranch_ReturnBranchName() {
+        val project = project()
+
+        val git = gitInit()
+        git.commit().setMessage("init").call()
+        git.checkout().setCreateBranch(true).setName("myBranch").call()
+        git.commit().setMessage("init2").call()
+        git.checkout().setCreateBranch(true).setName("myBranch2").call()
+
+        val gitBlock = GitBlock(project)
+        val branchName = gitBlock.lastCommitDescribe()
+
+        assertThat(branchName).isEqualTo("refs/heads/myBranch")
+    }
+
+    @Test
+    fun lastCommitDescription_GivenRepositoryOnDetachedHead_ReturnBranchName() {
+        val project = project()
+
+        val git = gitInit()
+        val revCommit = git.commit().setMessage("init").call()
+        git.checkout().setName(revCommit.name).call()
+
+        val gitBlock = GitBlock(project)
+        val branchName = gitBlock.lastCommitDescribe()
+
+        assertThat(branchName).isEqualTo("refs/heads/master")
+    }
+
+    @Test
     fun lastCommitSha1_GivenEmptyRepository_ReturnNull() {
         val project = project()
 
