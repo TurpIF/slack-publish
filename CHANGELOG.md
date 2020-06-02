@@ -1,6 +1,7 @@
 ## Version 0.2.0
 
 - Support simple git describe in git block
+- Use git describe in default git block
 
 ## Version 0.1.0
 

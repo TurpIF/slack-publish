@@ -299,7 +299,7 @@ class GitBlockTest {
         val message = SlackMessage("name", project)
 
         val gitBlock = spy(GitBlock(project)) {
-            doReturn("myBranch").whenever(mock).currentBranchName()
+            doReturn("myDescribe").whenever(mock).lastCommitDescribe()
             doReturn("author@email.com").whenever(mock).lastCommitAuthorEmail()
             doReturn("commit message").whenever(mock).lastCommitShortMessage()
             doReturn("92cfceb39d57d914ed8b14d0e37643de0797ae56").whenever(mock).lastCommitSha1()
@@ -328,7 +328,7 @@ class GitBlockTest {
 
         assertThat(block).isEqualTo(SectionBlock.builder().build())
         assertThat(fields).hasSize(4)
-        fields[0].assertIsMarkdown("*Git Branch*\nmyBranch")
+        fields[0].assertIsMarkdown("*Git Describe*\n`myDescribe`")
         fields[1].assertIsMarkdown("*Git Author*\n<mailto:author@email.com|author@email.com>")
         fields[2].assertIsMarkdown("*Git Commit*\ncommit message")
         fields[3].assertIsMarkdown("*Git SHA-1*\n`92cfceb39d57d914ed8b14d0e37643de0797ae56`")

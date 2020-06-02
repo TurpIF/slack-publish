@@ -99,7 +99,7 @@ class GitBlock(project: Project): SlackMessageBlock() {
 
     override fun defaultFormat(message: SlackMessage) {
         message.fields {
-            field("Git Branch", currentBranchName())
+            field("Git Describe", "`${lastCommitDescribe()}`")
             field("Git Author", "<mailto:${lastCommitAuthorEmail()}|${lastCommitAuthorEmail()}>")
             field("Git Commit", lastCommitShortMessage())
             field("Git SHA-1", "`${lastCommitSha1()}`")
